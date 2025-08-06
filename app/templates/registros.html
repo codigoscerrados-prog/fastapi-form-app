@@ -14,6 +14,23 @@
     <div class="container mt-5">
         <h2 class="mb-4">Lista de Usuarios Registrados</h2>
 
+        <!-- 🔍 Filtro por columna -->
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <select id="columnaSelect" class="form-select">
+                    <option value="1">Nombre</option>
+                    <option value="2">Dirección</option>
+                    <option value="3">Fecha de Nacimiento</option>
+                    <option value="4">Género</option>
+                    <option value="5">Teléfono</option>
+                    <option value="6">Correo</option>
+                </select>
+            </div>
+            <div class="col-md-8">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar en columna seleccionada...">
+            </div>
+        </div>
+
         {% if usuarios %}
         <table id="usuariosTable" class="table table-bordered table-striped">
             <thead class="table-dark">
@@ -67,15 +84,20 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
-    <!-- Activar DataTables -->
+    <!-- Activar DataTables + búsqueda por columna -->
     <script>
         $(document).ready(function () {
-            $('#usuariosTable').DataTable({
+            const table = $('#usuariosTable').DataTable({
                 "pageLength": 10,
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
                 },
-                "order": []  // No orden inicial
+                "order": [] // sin orden inicial
+            });
+
+            $('#searchInput').on('keyup', function () {
+                const columna = $('#columnaSelect').val();
+                table.column(columna).search(this.value).draw();
             });
         });
     </script>

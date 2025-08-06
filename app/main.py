@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, Request, Form, Path
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -8,13 +8,14 @@ from .database import SessionLocal, engine
 from passlib.context import CryptContext
 from starlette.responses import RedirectResponse
 from .models import LoginUser
-
+from starlette.middleware.sessions import SessionMiddleware
 
 # Crear tablas
 models.Base.metadata.create_all(bind=engine)
 
 # Iniciar app
 app = FastAPI()
+app.add_middleware(SessionMiddleware, secret_key="tu_clave_secreta_segura")
 
 # Plantillas HTML
 templates = Jinja2Templates(directory="app/templates")  # asegúrate que esta carpeta exista
@@ -52,7 +53,14 @@ def submit_user(data: schemas.UserCreate, db: Session = Depends(get_db)):
 # Página HTML con formulario
 @app.get("/form", response_class=HTMLResponse)
 def form_page(request: Request):
-    return templates.TemplateResponse("form.html", {"request": request})
+    if not require_login(request):
+        return RedirectResponse(url="/", status_code=303)
+    return templates.TemplateResponse("form.html", {
+        "request": request,
+        "username": request.session.get("user")
+    })
+
+
 
 # Procesar envío del formulario
 @app.post("/form", response_class=HTMLResponse)
@@ -91,8 +99,16 @@ def submit_form(
 
 @app.get("/registros", response_class=HTMLResponse)
 def mostrar_usuarios(request: Request, db: Session = Depends(get_db)):
+    if not require_login(request):
+        return RedirectResponse(url="/", status_code=303)
     usuarios = db.query(models.User).all()
-    return templates.TemplateResponse("registros.html", {"request": request, "usuarios": usuarios})
+    return templates.TemplateResponse("registros.html", {
+        "request": request,
+        "usuarios": usuarios,
+        "username": request.session.get("user")
+    })
+
+
 
 #Actualizar datos
 @app.post("/actualizar/{user_id}", response_class=HTMLResponse)
@@ -170,8 +186,19 @@ def login(
 ):
     user = db.query(models.LoginUser).filter(models.LoginUser.username == username).first()
     if user and verify_password(password, user.password):
-        message = f"Bienvenido, {username}."
-        return templates.TemplateResponse("form.html", {"request": request, "message": message})
+        request.session["user"] = username  # ← Guardamos en la sesión
+        return RedirectResponse(url="/form", status_code=303)
     else:
         return templates.TemplateResponse("login.html", {"request": request, "message": "Usuario o contraseña incorrectos"})
+
+def require_login(request: Request):
+    user = request.session.get("user")
+    if not user:
+        return False
+    return True
+
+@app.get("/logout")
+def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse(url="/", status_code=303)
 

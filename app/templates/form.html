@@ -10,6 +10,11 @@
 <body class="bg-light">
     <div class="container mt-5">
         <h2 class="mb-4">Formulario de Registro</h2>
+        <div class="text-end mb-3">
+            <span>Bienvenido, <strong>{{ username }}</strong></span>
+            <a href="/logout" class="btn btn-outline-danger btn-sm ms-2">Cerrar sesión</a>
+        </div>
+
 
         {% if message %}
         <div class="alert alert-info">{{ message }}</div>

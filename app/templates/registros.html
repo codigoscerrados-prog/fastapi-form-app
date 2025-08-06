@@ -20,6 +20,11 @@
 <body class="bg-light">
     <div class="container mt-5">
         <h2 class="mb-4">Lista de Usuarios Registrados</h2>
+        <div class="text-end mb-3">
+            <span>Bienvenido, <strong>{{ username }}</strong></span>
+            <a href="/logout" class="btn btn-outline-danger btn-sm ms-2">Cerrar sesión</a>
+        </div>
+
 
         <!-- 🔍 Filtro por columna -->
         <div class="row mb-3">
@@ -34,7 +39,8 @@
                 </select>
             </div>
             <div class="col-md-8">
-                <input type="text" id="searchInput" class="form-control" placeholder="Buscar en columna seleccionada...">
+                <input type="text" id="searchInput" class="form-control"
+                    placeholder="Buscar en columna seleccionada...">
             </div>
         </div>
 
@@ -59,10 +65,12 @@
                         <td>{{ user.id }}</td>
                         <td>
                             <span class="d-none">{{ user.name }}</span>
-                            <input type="text" name="name" value="{{ user.name }}" class="form-control"></td>
+                            <input type="text" name="name" value="{{ user.name }}" class="form-control">
+                        </td>
                         <td>
                             <span class="d-none">{{ user.address }}</span>
-                            <input type="text" name="address" value="{{ user.address }}" class="form-control"></td>
+                            <input type="text" name="address" value="{{ user.address }}" class="form-control">
+                        </td>
                         <td>
                             <span class="d-none">{{ user.birth_date }}</span>
                             <input type="date" name="birth_date" value="{{ user.birth_date }}" class="form-control">
@@ -70,17 +78,21 @@
                         <td>
                             <span class="d-none">{{ user.gender }}</span>
                             <select name="gender" class="form-select">
-                                <option value="Masculino" {% if user.gender=='Masculino' %}selected{% endif %}>Masculino</option>
-                                <option value="Femenino" {% if user.gender=='Femenino' %}selected{% endif %}>Femenino</option>
+                                <option value="Masculino" {% if user.gender=='Masculino' %}selected{% endif %}>Masculino
+                                </option>
+                                <option value="Femenino" {% if user.gender=='Femenino' %}selected{% endif %}>Femenino
+                                </option>
                                 <option value="Otro" {% if user.gender=='Otro' %}selected{% endif %}>Otro</option>
                             </select>
                         </td>
                         <td>
                             <span class="d-none">{{ user.phone }}</span>
-                            <input type="text" name="phone" value="{{ user.phone }}" class="form-control"></td>
+                            <input type="text" name="phone" value="{{ user.phone }}" class="form-control">
+                        </td>
                         <td>
                             <span class="d-none">{{ user.email }}</span>
-                            <input type="email" name="email" value="{{ user.email }}" class="form-control"></td>
+                            <input type="email" name="email" value="{{ user.email }}" class="form-control">
+                        </td>
                         <td><button type="submit" class="btn btn-sm btn-warning">Guardar</button></td>
                     </form>
                 </tr>

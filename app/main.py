@@ -84,3 +84,8 @@ def submit_form(
         message = f"Ocurrió un error: {str(e)}"
 
     return templates.TemplateResponse("form.html", {"request": request, "message": message})
+
+@app.get("/usuarios/")
+def listar_usuarios(db: Session = Depends(get_db)):
+    usuarios = db.query(models.User).all()
+    return usuarios

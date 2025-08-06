@@ -20,15 +20,39 @@
                 <label for="name" class="form-label">Nombre</label>
                 <input type="text" class="form-control" name="name" required>
             </div>
+
             <div class="mb-3">
                 <label for="address" class="form-label">Dirección</label>
                 <input type="text" class="form-control" name="address" required>
             </div>
+
             <div class="mb-3">
                 <label for="birth_date" class="form-label">Fecha de Nacimiento</label>
                 <input type="date" class="form-control" name="birth_date" required>
             </div>
+
             <div class="mb-3">
                 <label for="gender" class="form-label">Género</label>
                 <select name="gender" class="form-select" required>
-                    <option value="Masculino">Mas
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="phone" class="form-label">Teléfono</label>
+                <input type="text" class="form-control" name="phone" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo Electrónico</label>
+                <input type="email" class="form-control" name="email" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Enviar</button>
+        </form>
+    </div>
+</body>
+
+</html>

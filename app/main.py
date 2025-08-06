@@ -85,7 +85,8 @@ def submit_form(
 
     return templates.TemplateResponse("form.html", {"request": request, "message": message})
 
-@app.get("/usuarios/")
-def listar_usuarios(db: Session = Depends(get_db)):
+@app.get("/registros", response_class=HTMLResponse)
+def mostrar_usuarios(request: Request, db: Session = Depends(get_db)):
     usuarios = db.query(models.User).all()
-    return usuarios
+    return templates.TemplateResponse("registros.html", {"request": request, "usuarios": usuarios})
+

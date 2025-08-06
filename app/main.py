@@ -5,6 +5,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from . import models, schemas, email_utils
 from .database import SessionLocal, engine
+from passlib.context import CryptContext
+from starlette.responses import RedirectResponse
+
 
 # Crear tablas
 models.Base.metadata.create_all(bind=engine)
@@ -117,3 +120,57 @@ def actualizar_usuario(
     # Redirige a la página de registros actualizada
     usuarios = db.query(models.User).all()
     return templates.TemplateResponse("registros.html", {"request": request, "usuarios": usuarios})
+
+#Seguridad e inicio de sesion
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+#Registro de Usuario
+
+@app.get("/register", response_class=HTMLResponse)
+def form_registro_usuario(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
+
+@app.post("/register", response_class=HTMLResponse)
+def registrar_usuario(
+    request: Request,
+    username: str = Form(...),
+    password: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    hashed_password = get_password_hash(password)
+    new_user = models.LoginUser(username=username, password=hashed_password)
+    try:
+        db.add(new_user)
+        db.commit()
+        message = "Usuario registrado correctamente. Ya puedes iniciar sesión."
+    except IntegrityError:
+        db.rollback()
+        message = "El nombre de usuario ya existe."
+    return templates.TemplateResponse("register.html", {"request": request, "message": message})
+
+#Login
+@app.get("/login", response_class=HTMLResponse)
+def form_login(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@app.post("/login", response_class=HTMLResponse)
+def login(
+    request: Request,
+    username: str = Form(...),
+    password: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    user = db.query(models.LoginUser).filter(models.LoginUser.username == username).first()
+    if user and verify_password(password, user.password):
+        message = f"Bienvenido, {username}."
+        return templates.TemplateResponse("form.html", {"request": request, "message": message})
+    else:
+        return templates.TemplateResponse("login.html", {"request": request, "message": "Usuario o contraseña incorrectos"})
+

@@ -12,3 +12,10 @@ class User(Base):
     phone = Column(String)
     email = Column(String, unique=True, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class LoginUser(Base):
+    __tablename__ = "login_users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    password = Column(String)

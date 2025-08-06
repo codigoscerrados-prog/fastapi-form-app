@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, Request, Form
+from fastapi import FastAPI, Depends, Request, Form, Path
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -90,3 +90,29 @@ def mostrar_usuarios(request: Request, db: Session = Depends(get_db)):
     usuarios = db.query(models.User).all()
     return templates.TemplateResponse("registros.html", {"request": request, "usuarios": usuarios})
 
+@app.post("/actualizar/{user_id}", response_class=HTMLResponse)
+def actualizar_usuario(
+    request: Request,
+    user_id: int = Path(...),
+    name: str = Form(...),
+    address: str = Form(...),
+    birth_date: str = Form(...),
+    gender: str = Form(...),
+    phone: str = Form(...),
+    email: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    usuario = db.query(models.User).filter(models.User.id == user_id).first()
+    if usuario:
+        usuario.name = name
+        usuario.address = address
+        usuario.birth_date = birth_date
+        usuario.gender = gender
+        usuario.phone = phone
+        usuario.email = email
+        db.commit()
+        db.refresh(usuario)
+
+    # Redirige a la página de registros actualizada
+    usuarios = db.query(models.User).all()
+    return templates.TemplateResponse("registros.html", {"request": request, "usuarios": usuarios})

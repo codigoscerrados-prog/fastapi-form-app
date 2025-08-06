@@ -14,6 +14,7 @@
 
         {% if usuarios %}
         <table class="table table-bordered table-striped">
+            <!-- Solo reemplaza la parte de la tabla -->
             <thead class="table-dark">
                 <tr>
                     <th>ID</th>
@@ -23,21 +24,35 @@
                     <th>Género</th>
                     <th>Teléfono</th>
                     <th>Correo</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 {% for user in usuarios %}
                 <tr>
-                    <td>{{ user.id }}</td>
-                    <td>{{ user.name }}</td>
-                    <td>{{ user.address }}</td>
-                    <td>{{ user.birth_date }}</td>
-                    <td>{{ user.gender }}</td>
-                    <td>{{ user.phone }}</td>
-                    <td>{{ user.email }}</td>
+                    <form method="post" action="/actualizar/{{ user.id }}">
+                        <td>{{ user.id }}</td>
+                        <td><input type="text" name="name" value="{{ user.name }}" class="form-control"></td>
+                        <td><input type="text" name="address" value="{{ user.address }}" class="form-control"></td>
+                        <td><input type="date" name="birth_date" value="{{ user.birth_date }}" class="form-control">
+                        </td>
+                        <td>
+                            <select name="gender" class="form-select">
+                                <option value="Masculino" {% if user.gender=='Masculino' %}selected{% endif %}>Masculino
+                                </option>
+                                <option value="Femenino" {% if user.gender=='Femenino' %}selected{% endif %}>Femenino
+                                </option>
+                                <option value="Otro" {% if user.gender=='Otro' %}selected{% endif %}>Otro</option>
+                            </select>
+                        </td>
+                        <td><input type="text" name="phone" value="{{ user.phone }}" class="form-control"></td>
+                        <td><input type="email" name="email" value="{{ user.email }}" class="form-control"></td>
+                        <td><button type="submit" class="btn btn-sm btn-warning">Guardar</button></td>
+                    </form>
                 </tr>
                 {% endfor %}
             </tbody>
+
         </table>
         {% else %}
         <div class="alert alert-info">No hay usuarios registrados aún.</div>

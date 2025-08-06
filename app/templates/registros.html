@@ -8,6 +8,13 @@
 
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+    <!-- Ocultar el buscador global de DataTables -->
+    <style>
+        .dataTables_filter {
+            display: none !important;
+        }
+    </style>
 </head>
 
 <body class="bg-light">
@@ -88,16 +95,25 @@
     <script>
         $(document).ready(function () {
             const table = $('#usuariosTable').DataTable({
-                "pageLength": 10,
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+                pageLength: 10,
+                order: [],
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
                 },
-                "order": [] // sin orden inicial
+                dom: 'lrtip'  // Oculta el filtro global
             });
 
+            // Filtro por columna seleccionada
             $('#searchInput').on('keyup', function () {
-                const columna = $('#columnaSelect').val();
-                table.column(columna).search(this.value).draw();
+                const col = parseInt($('#columnaSelect').val());
+                table.columns().search(''); // Limpia otras búsquedas
+                table.column(col).search(this.value).draw();
+            });
+
+            // Limpia el campo al cambiar de columna
+            $('#columnaSelect').on('change', function () {
+                $('#searchInput').val('');
+                table.columns().search('').draw();
             });
         });
     </script>

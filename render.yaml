@@ -2,13 +2,13 @@ services:
   - type: web
     name: fastapi-form-app
     env: python
-    repo: https://github.com/tuusuario/form-api
+    repo: https://github.com/codigoscerrados-prog/fastapi-form-app.git
     buildCommand: "pip install -r requirements.txt"
     startCommand: "uvicorn app.main:app --host 0.0.0.0 --port 10000"
     envVars:
       - key: DATABASE_URL
-        value: "tu_postgresql_url"
+        value: "postgresql://jfm:jHSiUmhq6FPsSgoZ9fkNCMYpuo5kBgzo@dpg-d29nkbk9c44c73estt3g-a.oregon-postgres.render.com/dbformularioexample_7vlb"
       - key: EMAIL_USER
-        value: "tucorreo@gmail.com"
+        value: "codigoscerrados@gmail.com"
       - key: EMAIL_PASS
-        value: "tu_clave_app"
+        value: "jlrn soxq ppek xnta"

@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from . import models, schemas, email_utils, LoginUser
+from . import models, schemas, email_utils
 from .database import SessionLocal, engine
 from passlib.context import CryptContext
 from starlette.responses import RedirectResponse

@@ -3,109 +3,35 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Usuarios Registrados</title>
+    <title>Crear Cuenta</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    <style>
-        /* Ocultar la búsqueda global de DataTables */
-        .dataTables_filter {
-            display: none;
-        }
-    </style>
 </head>
 
 <body class="bg-light">
     <div class="container mt-5">
-        <h2 class="mb-4">Lista de Usuarios Registrados</h2>
+        <h2>Registro de Usuario</h2>
 
-        <!-- 🔍 Filtro por columna -->
-        <div class="row mb-3">
-            <div class="col-md-4">
-                <select id="columnaSelect" class="form-select">
-                    <option value="1">Nombre</option>
-                    <option value="2">Dirección</option>
-                    <option value="3">Fecha de Nacimiento</option>
-                    <option value="4">Género</option>
-                    <option value="5">Teléfono</option>
-                    <option value="6">Correo</option>
-                </select>
-            </div>
-            <div class="col-md-8">
-                <input type="text" id="searchInput" class="form-control" placeholder="Buscar en columna seleccionada...">
-            </div>
-        </div>
-
-        {% if usuarios %}
-        <table id="usuariosTable" class="table table-bordered table-striped">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Dirección</th>
-                    <th>Fecha de Nacimiento</th>
-                    <th>Género</th>
-                    <th>Teléfono</th>
-                    <th>Correo</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in usuarios %}
-                <tr>
-                    <form method="post" action="/actualizar/{{ user.id }}">
-                        <td>{{ user.id }}</td>
-                        <td><input type="text" name="name" value="{{ user.name }}" class="form-control"></td>
-                        <td><input type="text" name="address" value="{{ user.address }}" class="form-control"></td>
-                        <td><input type="date" name="birth_date" value="{{ user.birth_date }}" class="form-control"></td>
-                        <td>
-                            <select name="gender" class="form-select">
-                                <option value="Masculino" {% if user.gender=='Masculino' %}selected{% endif %}>Masculino</option>
-                                <option value="Femenino" {% if user.gender=='Femenino' %}selected{% endif %}>Femenino</option>
-                                <option value="Otro" {% if user.gender=='Otro' %}selected{% endif %}>Otro</option>
-                            </select>
-                        </td>
-                        <td><input type="text" name="phone" value="{{ user.phone }}" class="form-control"></td>
-                        <td><input type="email" name="email" value="{{ user.email }}" class="form-control"></td>
-                        <td><button type="submit" class="btn btn-sm btn-warning">Guardar</button></td>
-                    </form>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <div class="mt-3">
-            <a href="/form" class="btn btn-secondary">Atrás</a>
-        </div>
-
-        {% else %}
-        <div class="alert alert-info">No hay usuarios registrados aún.</div>
+        {% if message %}
+        <div class="alert alert-info">{{ message }}</div>
         {% endif %}
+
+        <form method="post" action="/register">
+            <div class="mb-3">
+                <label class="form-label">Nombre de Usuario</label>
+                <input type="text" name="username" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Contraseña</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary">Crear Cuenta</button>
+                <a href="/" class="btn btn-secondary">Volver al Login</a>
+            </div>
+        </form>
     </div>
-
-    <!-- JS: jQuery + DataTables -->
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
-    <!-- DataTables con filtro por columna personalizada -->
-    <script>
-        $(document).ready(function () {
-            const table = $('#usuariosTable').DataTable({
-                pageLength: 10,
-                order: [],
-                language: {
-                    url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
-                }
-            });
-
-            $('#searchInput').on('keyup', function () {
-                const columnaIndex = $('#columnaSelect').val();
-                table.columns().search('');  // Limpiar búsquedas anteriores
-                table.column(columnaIndex).search(this.value).draw();
-            });
-        });
-    </script>
 </body>
 
 </html>

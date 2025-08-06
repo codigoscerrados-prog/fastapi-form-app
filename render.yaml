@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: fastapi-form-app
+    env: python
+    repo: https://github.com/tuusuario/form-api
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port 10000"
+    envVars:
+      - key: DATABASE_URL
+        value: "tu_postgresql_url"
+      - key: EMAIL_USER
+        value: "tucorreo@gmail.com"
+      - key: EMAIL_PASS
+        value: "tu_clave_app"

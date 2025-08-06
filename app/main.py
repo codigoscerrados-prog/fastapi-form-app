@@ -3,11 +3,10 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from . import models, schemas, email_utils
+from . import models, schemas, email_utils, LoginUser
 from .database import SessionLocal, engine
 from passlib.context import CryptContext
 from starlette.responses import RedirectResponse
-
 
 # Crear tablas
 models.Base.metadata.create_all(bind=engine)

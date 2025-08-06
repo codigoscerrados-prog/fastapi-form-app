@@ -6,3 +6,4 @@ python-dotenv
 email-validator
 jinja2
 python-multipart
+passlib

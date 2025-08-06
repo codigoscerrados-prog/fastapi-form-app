@@ -20,9 +20,9 @@ app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")  # asegúrate que esta carpeta exista
 
 # Ruta raíz
-@app.get("/")
-def root():
-    return {"message": "¡Hola! La API está funcionando correctamente."}
+#@app.get("/")
+#def root():
+#    return {"message": "¡Hola! La API está funcionando correctamente."}
 
 # Dependencia DB
 def get_db():
@@ -157,7 +157,7 @@ def registrar_usuario(
     return templates.TemplateResponse("register.html", {"request": request, "message": message})
 
 #Login
-@app.get("/login", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse)
 def form_login(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 

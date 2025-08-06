@@ -90,6 +90,7 @@ def mostrar_usuarios(request: Request, db: Session = Depends(get_db)):
     usuarios = db.query(models.User).all()
     return templates.TemplateResponse("registros.html", {"request": request, "usuarios": usuarios})
 
+#Actualizar datos
 @app.post("/actualizar/{user_id}", response_class=HTMLResponse)
 def actualizar_usuario(
     request: Request,

@@ -7,6 +7,8 @@ from . import models, schemas, email_utils
 from .database import SessionLocal, engine
 from passlib.context import CryptContext
 from starlette.responses import RedirectResponse
+from .models import LoginUser
+
 
 # Crear tablas
 models.Base.metadata.create_all(bind=engine)

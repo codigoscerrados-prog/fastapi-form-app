@@ -5,4 +5,4 @@ psycopg2-binary
 python-dotenv
 email-validator
 jinja2
-pip freeze > requirements.txt
+python-multipart

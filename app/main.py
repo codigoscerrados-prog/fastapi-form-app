@@ -9,6 +9,7 @@ from passlib.context import CryptContext
 from starlette.responses import RedirectResponse
 from .models import LoginUser
 from starlette.middleware.sessions import SessionMiddleware
+from sqlalchemy.orm import joinedload
 
 # =========================
 # CONFIGURACIÓN INICIAL
@@ -122,13 +123,10 @@ def submit_form(
 # =========================
 @app.get("/registros", response_class=HTMLResponse)
 def mostrar_usuarios(request: Request, db: Session = Depends(get_db)):
-    """
-    Lista todos los registros y muestra el creador de cada uno.
-    Solo accesible si el usuario ha iniciado sesión.
-    """
     if not require_login(request):
         return RedirectResponse(url="/", status_code=303)
-    usuarios = db.query(models.User).all()
+
+    usuarios = db.query(models.User).options(joinedload(models.User.creador)).all()
     return templates.TemplateResponse("registros.html", {
         "request": request,
         "usuarios": usuarios,

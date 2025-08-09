@@ -55,6 +55,7 @@
                     <th>Género</th>
                     <th>Teléfono</th>
                     <th>Correo</th>
+                    <th>Creado por</th> <!-- Nueva columna -->
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -93,6 +94,8 @@
                             <span class="d-none">{{ user.email }}</span>
                             <input type="email" name="email" value="{{ user.email }}" class="form-control">
                         </td>
+                        <!-- Nueva columna con el creador -->
+                        <td>{{ user.creador.username if user.creador else 'Desconocido' }}</td>
                         <td><button type="submit" class="btn btn-sm btn-warning">Guardar</button></td>
                     </form>
                 </tr>

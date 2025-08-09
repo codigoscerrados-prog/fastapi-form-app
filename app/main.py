@@ -75,13 +75,15 @@ def submit_form(
     db: Session = Depends(get_db)
 ):
     try:
+        creador_id = request.session.get("user_id")  # ID del usuario logueado
         user = models.User(
             name=name,
             address=address,
             birth_date=birth_date,
             gender=gender,
             phone=phone,
-            email=email
+            email=email,
+            creador_id=creador_id  # ← Relación
         )
         db.add(user)
         db.commit()
@@ -187,6 +189,7 @@ def login(
     user = db.query(models.LoginUser).filter(models.LoginUser.username == username).first()
     if user and verify_password(password, user.password):
         request.session["user"] = username  # ← Guardamos en la sesión
+        request.session["user_id"] = user.id  # ← Guardamos el ID del usuario
         return RedirectResponse(url="/form", status_code=303)
     else:
         return templates.TemplateResponse("login.html", {"request": request, "message": "Usuario o contraseña incorrectos"})

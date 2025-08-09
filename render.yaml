@@ -7,7 +7,7 @@ services:
     startCommand: "uvicorn app.main:app --host 0.0.0.0 --port 10000"
     envVars:
       - key: DATABASE_URL
-        value: "postgresql://jfm:jHSiUmhq6FPsSgoZ9fkNCMYpuo5kBgzo@dpg-d29nkbk9c44c73estt3g-a.oregon-postgres.render.com/dbformularioexample_7vlb"
+        value: "postgresql://jfm:jHSiUmhq6FPsSgoZ9fkNCMYpuo5kBgzo@dpg-d29nkbk9c44c73estt3g-a/dbformularioexample_7vlb"
       - key: EMAIL_USER
         value: "codigoscerrados@gmail.com"
       - key: EMAIL_PASS

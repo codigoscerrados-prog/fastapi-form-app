@@ -18,7 +18,7 @@ from datetime import datetime
 # =========================
 
 # Crear todas las tablas en la base de datos
-models.Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 # Inicializar la aplicación FastAPI
 app = FastAPI()

@@ -244,28 +244,31 @@ def logout(request: Request):
 
 #Generador del número de solicitud automático
 
-# Función para generar número de solicitud
+# ---------------------
+# Generar número solicitud
+# ---------------------
 def generar_numero_solicitud(db: Session):
-    year_suffix = str(datetime.datetime.now().year)[-2:]
-    count = db.query(models.SolicitudServicio).filter(
-        models.SolicitudServicio.numero_solicitud.like(f"%-{year_suffix}")
+    year_suffix = datetime.now().strftime("%y")
+    count = db.query(models.Solicitud).filter(
+        models.Solicitud.numero_solicitud.like(f"%-{year_suffix}")
     ).count()
-    numero = str(count + 1).zfill(6)  # 6 dígitos
-    return f"{numero}-{year_suffix}"
+    nuevo_numero = str(count + 1).zfill(6)
+    return f"{nuevo_numero}-{year_suffix}"
 
+# ---------------------
+# Formulario Solicitud
+# ---------------------
 @app.get("/solicitud", response_class=HTMLResponse)
-def solicitud_form(request: Request, db: Session = Depends(get_db)):
+def formulario_solicitud(request: Request, db: Session = Depends(get_db)):
     if not require_login(request):
-        return RedirectResponse(url="/login")
+        return RedirectResponse(url="/", status_code=303)
 
-    numero_solicitud = generar_numero_solicitud(db)
+    numero = generar_numero_solicitud(db)
+    return templates.TemplateResponse("solicitud.html", {"request": request, "numero": numero})
 
-    return templates.TemplateResponse("solicitud.html", {
-        "request": request,
-        "numero_solicitud": numero_solicitud
-    })
-
-
+# ---------------------
+# Guardar Solicitud
+# ---------------------
 @app.post("/solicitud", response_class=HTMLResponse)
 def guardar_solicitud(
     request: Request,
@@ -290,22 +293,28 @@ def guardar_solicitud(
     nota: str = Form(None),
     grupo_destinatario: str = Form(...),
 
-    muestra_vias: list = Form([]),
-    matriz: list = Form([]),
-    producto_declarado: list = Form([]),
-    referencias: list = Form([]),
-    analisis: list = Form([]),
-    acreditacion: list = Form([]),
-    cantidad_minima: list = Form([]),
-    unidad: list = Form([]),
-    tiempo_reporte: list = Form([]),
-    metodo: list = Form([]),
+    muestra_vias: list[str] = Form([]),
+    matriz: list[str] = Form([]),
+    producto_declarado: list[str] = Form([]),
+    referencias: list[str] = Form([]),
+
+    analisis: list[str] = Form([]),
+    acreditacion: list[str] = Form([]),
+    cantidad_minima: list[str] = Form([]),
+    unidad: list[str] = Form([]),
+    tiempo_reporte: list[str] = Form([]),
+
+    metodo: list[str] = Form([]),
 
     db: Session = Depends(get_db)
 ):
+    if not require_login(request):
+        return RedirectResponse(url="/", status_code=303)
+
     numero = generar_numero_solicitud(db)
 
-    solicitud = models.SolicitudServicio(
+    # Crear solicitud
+    solicitud = models.Solicitud(
         numero_solicitud=numero,
         tipo_servicio=tipo_servicio,
         empresa=empresa,
@@ -326,33 +335,49 @@ def guardar_solicitud(
         observaciones=observaciones,
         observaciones_emision=observaciones_emision,
         nota=nota,
-        grupo_destinatario=grupo_destinatario
+        grupo_destinatario_matriz=grupo_destinatario
     )
 
     # Guardar muestras
     for i in range(len(muestra_vias)):
         if muestra_vias[i].strip():
-            solicitud.muestras.append(models.Muestra(
+            m = models.Muestra(
                 muestra_vias=muestra_vias[i],
                 matriz=matriz[i],
                 producto_declarado=producto_declarado[i],
                 referencias=referencias[i],
-                analisis=analisis[i],
-                acreditacion=acreditacion[i],
-                cantidad_minima=cantidad_minima[i],
-                unidad=unidad[i],
-                tiempo_reporte=tiempo_reporte[i]
-            ))
+                analisis=analisis[i] if i < len(analisis) else None,
+                acreditacion=acreditacion[i] if i < len(acreditacion) else None,
+                cantidad_minima=cantidad_minima[i] if i < len(cantidad_minima) else None,
+                unidad=unidad[i] if i < len(unidad) else None,
+                tiempo_reporte=tiempo_reporte[i] if i < len(tiempo_reporte) else None
+            )
+            solicitud.muestras.append(m)
 
-    # Guardar métodos
-    for i in range(len(metodo)):
-        if metodo[i].strip():
-            solicitud.metodos.append(models.Metodo(
-                analisis=analisis[i],
-                metodo=metodo[i]
-            ))
+    # Guardar métodos (asociados a cada muestra)
+    for idx, met in enumerate(metodo):
+        if met.strip():
+            # Buscar a qué muestra corresponde este método
+            if idx < len(solicitud.muestras):
+                solicitud.muestras[idx].metodos.append(models.Metodo(
+                    analisis=solicitud.muestras[idx].analisis,
+                    metodo=met
+                ))
 
     db.add(solicitud)
     db.commit()
 
     return RedirectResponse(url="/solicitud", status_code=303)
+
+@app.get("/solicitudes", response_class=HTMLResponse)
+def listar_solicitudes(request: Request, db: Session = Depends(get_db)):
+    if not require_login(request):
+        return RedirectResponse(url="/", status_code=303)
+
+    solicitudes = db.query(models.Solicitud).all()
+
+    return templates.TemplateResponse("solicitudes.html", {
+        "request": request,
+        "solicitudes": solicitudes,
+        "username": request.session.get("user")
+    })

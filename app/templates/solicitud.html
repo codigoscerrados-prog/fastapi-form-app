@@ -4,240 +4,217 @@
     <meta charset="UTF-8">
     <title>Solicitud de Servicios</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .seccion {
-            border: 1px solid #ccc;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 10px;
+    <script>
+        function agregarFilaMuestra() {
+            const tbody = document.getElementById("muestras-body");
+            tbody.insertAdjacentHTML("beforeend", `
+                <tr>
+                    <td><input type="text" name="muestra_vias" class="form-control"></td>
+                    <td><input type="text" name="matriz" class="form-control"></td>
+                    <td><input type="text" name="producto_declarado" class="form-control"></td>
+                    <td><input type="text" name="referencias" class="form-control"></td>
+                </tr>
+            `);
         }
-        h4 {
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 5px;
+
+        function agregarFilaAnalisis() {
+            const tbody = document.getElementById("analisis-body");
+            tbody.insertAdjacentHTML("beforeend", `
+                <tr>
+                    <td><input type="text" name="analisis" class="form-control" oninput="sincronizarMetodos()"></td>
+                    <td><input type="text" name="acreditacion" class="form-control"></td>
+                    <td><input type="text" name="cantidad_minima" class="form-control"></td>
+                    <td><input type="text" name="unidad" class="form-control"></td>
+                    <td><input type="text" name="tiempo_reporte" class="form-control"></td>
+                </tr>
+            `);
         }
-    </style>
+
+        function sincronizarMetodos() {
+            const analisisInputs = document.querySelectorAll('input[name="analisis"]');
+            const tbody = document.getElementById("metodos-body");
+            tbody.innerHTML = "";
+            analisisInputs.forEach(input => {
+                if (input.value.trim() !== "") {
+                    tbody.insertAdjacentHTML("beforeend", `
+                        <tr>
+                            <td><input type="text" class="form-control" value="${input.value}" readonly></td>
+                            <td><input type="text" name="metodo" class="form-control"></td>
+                        </tr>
+                    `);
+                }
+            });
+        }
+    </script>
 </head>
 <body class="bg-light">
-
 <div class="container mt-4">
     <h2>Solicitud de Servicios</h2>
-    <form method="post" action="/solicitud">
-        
-        <!-- Número de solicitud -->
+    <form action="/solicitud" method="post">
+
         <div class="mb-3">
-            <label class="form-label fw-bold">Número de Solicitud</label>
-            <input type="text" class="form-control" value="{{ numero }}" readonly>
+            <label><strong>Número de Solicitud:</strong></label>
+            <input type="text" name="numero_solicitud" value="{{ numero }}" class="form-control" readonly>
         </div>
 
-        <!-- Bloque 1 -->
-        <div class="row seccion">
-            <div class="col">
-                <label>Tipo de servicio</label>
-                <select name="tipo_servicio" class="form-control" required>
-                    <option value="">Seleccione</option>
-                    <option>Servicio 1</option>
-                    <option>Servicio 2</option>
+        <!-- 1ª fila -->
+        <div class="row">
+            <div class="col-md-4">
+                <label>Tipo de Servicio</label>
+                <select name="tipo_servicio" class="form-control">
+                    <option value="">Seleccione...</option>
+                    <option>Servicio A</option>
+                    <option>Servicio B</option>
                 </select>
             </div>
-            <div class="col">
+            <div class="col-md-4">
                 <label>Empresa</label>
-                <input type="text" name="empresa" class="form-control" required>
+                <input type="text" name="empresa" class="form-control">
             </div>
-            <div class="col">
+            <div class="col-md-4">
                 <label>RUC</label>
-                <input type="text" name="ruc" class="form-control" required>
+                <input type="text" name="ruc" class="form-control">
             </div>
         </div>
 
-        <!-- Bloque 2 -->
-        <div class="row seccion">
-            <div class="col">
-                <label>Titular de informe</label>
-                <input type="text" name="titular_informe" class="form-control" required>
+        <!-- 2ª fila -->
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <label>Titular de Informe</label>
+                <input type="text" name="titular_informe" class="form-control">
             </div>
-            <div class="col">
+            <div class="col-md-4">
                 <label>Producto</label>
-                <input type="text" name="producto" class="form-control" required>
+                <input type="text" name="producto" class="form-control">
             </div>
-            <div class="col">
-                <label>Tipo de certificado</label>
-                <input type="text" name="tipo_certificado" class="form-control" required>
+            <div class="col-md-4">
+                <label>Tipo de Certificado</label>
+                <input type="text" name="tipo_certificado" class="form-control">
             </div>
         </div>
 
-        <!-- Bloque 3 -->
-        <div class="row seccion">
-            <div class="col">
-                <label>Fecha de inspección/muestreo</label>
-                <input type="date" name="fecha_inspeccion" class="form-control" required>
+        <!-- 3ª fila -->
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <label>Tipo de Proceso</label>
+                <input type="text" name="tipo_proceso" class="form-control">
             </div>
-            <div class="col">
-                <label>Hora de inspección/muestreo</label>
-                <input type="time" name="hora_inspeccion" class="form-control" required>
+            <div class="col-md-4">
+                <label>Solicitante</label>
+                <input type="text" name="solicitante" class="form-control">
             </div>
-            <div class="col">
+            <div class="col-md-4">
+                <label>Idioma de Informe</label>
+                <input type="text" name="idioma_informe" class="form-control">
+            </div>
+        </div>
+
+        <!-- 4ª fila -->
+        <div class="row mt-3">
+            <div class="col-md-4">
                 <label>Destino</label>
-                <input type="text" name="destino" class="form-control" required>
+                <input type="text" name="destino" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <label>Trámite</label>
+                <input type="text" name="tramite" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <label>Planta Productora</label>
+                <input type="text" name="planta_productora" class="form-control">
             </div>
         </div>
 
-        <!-- Otros datos -->
-        <div class="seccion">
-            <div class="row">
-                <div class="col">
-                    <label>Solicitante</label>
-                    <input type="text" name="solicitante" class="form-control" required>
-                </div>
-                <div class="col">
-                    <label>Idioma de informe</label>
-                    <input type="text" name="idioma_informe" class="form-control" required>
-                </div>
-                <div class="col">
-                    <label>Trámite</label>
-                    <input type="text" name="tramite" class="form-control" required>
-                </div>
+        <!-- 5ª fila -->
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <label>Sede Planta</label>
+                <input type="text" name="sede_planta" class="form-control">
             </div>
-            <div class="row mt-3">
-                <div class="col">
-                    <label>Planta productora</label>
-                    <input type="text" name="planta_productora" class="form-control">
-                </div>
-                <div class="col">
-                    <label>Sede planta</label>
-                    <input type="text" name="sede_planta" class="form-control">
-                </div>
-                <div class="col">
-                    <label>Dirección de inspección</label>
-                    <input type="text" name="direccion_inspeccion" class="form-control">
-                </div>
+            <div class="col-md-4">
+                <label>Dirección de Inspección</label>
+                <input type="text" name="direccion_inspeccion" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <label>Fecha de Inspección/Muestreo</label>
+                <input type="date" name="fecha_inspeccion" class="form-control">
             </div>
         </div>
 
-        <!-- Observaciones -->
-        <div class="seccion">
-            <label>Observaciones</label>
-            <textarea name="observaciones" class="form-control"></textarea>
-            <label class="mt-2">Observaciones Emisión</label>
-            <textarea name="observaciones_emision" class="form-control"></textarea>
-            <label class="mt-2">Nota</label>
-            <textarea name="nota" class="form-control"></textarea>
-            <label class="mt-2">Grupo destinatario / Matriz</label>
-            <input type="text" name="grupo_destinatario" class="form-control">
+        <!-- 6ª fila -->
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <label>Hora de Inspección/Muestreo</label>
+                <input type="time" name="hora_inspeccion" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <label>Observaciones</label>
+                <textarea name="observaciones" class="form-control"></textarea>
+            </div>
+            <div class="col-md-4">
+                <label>Observaciones Emisión</label>
+                <textarea name="observaciones_emision" class="form-control"></textarea>
+            </div>
         </div>
 
-        <!-- Sección Muestras -->
+        <!-- 7ª fila -->
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <label>Nota</label>
+                <textarea name="nota" class="form-control"></textarea>
+            </div>
+            <div class="col-md-4">
+                <label>Grupo Destinatario/Matriz</label>
+                <input type="text" name="grupo_destinatario" class="form-control">
+            </div>
+        </div>
+
+        <hr>
         <h4>Muestras</h4>
-        <table id="tabla-muestras" class="table table-bordered">
-            <thead class="table-light">
+        <table class="table table-bordered">
+            <thead>
                 <tr>
                     <th>Muestra/Vías</th>
                     <th>Matriz</th>
-                    <th>Producto declarado</th>
+                    <th>Producto Declarado</th>
                     <th>Referencias</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td><input name="muestra_vias[]" class="form-control"></td>
-                    <td><input name="matriz[]" class="form-control"></td>
-                    <td><input name="producto_declarado[]" class="form-control"></td>
-                    <td><input name="referencias[]" class="form-control"></td>
-                </tr>
-            </tbody>
+            <tbody id="muestras-body"></tbody>
         </table>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="agregarFilaMuestra()">+ Agregar Muestra</button>
+        <button type="button" class="btn btn-secondary" onclick="agregarFilaMuestra()">Agregar Muestra</button>
 
-        <!-- Sección Análisis -->
-        <h4 class="mt-4">Análisis</h4>
-        <table id="tabla-analisis" class="table table-bordered">
-            <thead class="table-light">
+        <hr>
+        <h4>Análisis</h4>
+        <table class="table table-bordered">
+            <thead>
                 <tr>
                     <th>Análisis</th>
                     <th>Acreditación</th>
-                    <th>Cantidad mínima</th>
+                    <th>Cantidad Mínima</th>
                     <th>Unidad</th>
-                    <th>Tiempo de reporte</th>
+                    <th>Tiempo de Reporte</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td><input name="analisis[]" class="form-control"></td>
-                    <td><input name="acreditacion[]" class="form-control"></td>
-                    <td><input name="cantidad_minima[]" class="form-control"></td>
-                    <td><input name="unidad[]" class="form-control"></td>
-                    <td><input name="tiempo_reporte[]" class="form-control"></td>
-                </tr>
-            </tbody>
+            <tbody id="analisis-body"></tbody>
         </table>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="agregarFilaAnalisis()">+ Agregar Análisis</button>
+        <button type="button" class="btn btn-secondary" onclick="agregarFilaAnalisis()">Agregar Análisis</button>
 
-        <!-- Sección Métodos -->
-        <h4 class="mt-4">Métodos</h4>
-        <table id="tabla-metodos" class="table table-bordered">
-            <thead class="table-light">
+        <hr>
+        <h4>Métodos</h4>
+        <table class="table table-bordered">
+            <thead>
                 <tr>
                     <th>Análisis</th>
                     <th>Método</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Se llena con JS -->
-            </tbody>
+            <tbody id="metodos-body"></tbody>
         </table>
 
-        <button type="submit" class="btn btn-primary mt-3">Guardar Solicitud</button>
+        <hr>
+        <button type="submit" class="btn btn-primary">Guardar Solicitud</button>
     </form>
 </div>
-
-<script>
-function agregarFilaMuestra() {
-    let tbody = document.querySelector("#tabla-muestras tbody");
-    let fila = `
-        <tr>
-            <td><input name="muestra_vias[]" class="form-control"></td>
-            <td><input name="matriz[]" class="form-control"></td>
-            <td><input name="producto_declarado[]" class="form-control"></td>
-            <td><input name="referencias[]" class="form-control"></td>
-        </tr>
-    `;
-    tbody.insertAdjacentHTML("beforeend", fila);
-}
-
-function agregarFilaAnalisis() {
-    let tbody = document.querySelector("#tabla-analisis tbody");
-    let fila = `
-        <tr>
-            <td><input name="analisis[]" class="form-control"></td>
-            <td><input name="acreditacion[]" class="form-control"></td>
-            <td><input name="cantidad_minima[]" class="form-control"></td>
-            <td><input name="unidad[]" class="form-control"></td>
-            <td><input name="tiempo_reporte[]" class="form-control"></td>
-        </tr>
-    `;
-    tbody.insertAdjacentHTML("beforeend", fila);
-    actualizarMetodos();
-}
-
-function actualizarMetodos() {
-    let analisisInputs = document.querySelectorAll('input[name="analisis[]"]');
-    let tbody = document.querySelector("#tabla-metodos tbody");
-    tbody.innerHTML = "";
-    analisisInputs.forEach(a => {
-        if (a.value.trim() !== "") {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${a.value}</td>
-                    <td><input name="metodo[]" class="form-control"></td>
-                </tr>
-            `;
-        }
-    });
-}
-
-// Escuchar cambios en análisis para actualizar métodos
-document.querySelector("#tabla-analisis").addEventListener("input", actualizarMetodos);
-</script>
-
 </body>
 </html>

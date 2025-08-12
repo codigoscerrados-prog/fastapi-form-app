@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Solicitud de Servicios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .seccion {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        h4 {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container mt-4">
+    <h2>Solicitud de Servicios</h2>
+    <form method="post" action="/solicitud">
+        
+        <!-- Número de solicitud -->
+        <div class="mb-3">
+            <label class="form-label fw-bold">Número de Solicitud</label>
+            <input type="text" class="form-control" value="{{ numero }}" readonly>
+        </div>
+
+        <!-- Bloque 1 -->
+        <div class="row seccion">
+            <div class="col">
+                <label>Tipo de servicio</label>
+                <select name="tipo_servicio" class="form-control" required>
+                    <option value="">Seleccione</option>
+                    <option>Servicio 1</option>
+                    <option>Servicio 2</option>
+                </select>
+            </div>
+            <div class="col">
+                <label>Empresa</label>
+                <input type="text" name="empresa" class="form-control" required>
+            </div>
+            <div class="col">
+                <label>RUC</label>
+                <input type="text" name="ruc" class="form-control" required>
+            </div>
+        </div>
+
+        <!-- Bloque 2 -->
+        <div class="row seccion">
+            <div class="col">
+                <label>Titular de informe</label>
+                <input type="text" name="titular_informe" class="form-control" required>
+            </div>
+            <div class="col">
+                <label>Producto</label>
+                <input type="text" name="producto" class="form-control" required>
+            </div>
+            <div class="col">
+                <label>Tipo de certificado</label>
+                <input type="text" name="tipo_certificado" class="form-control" required>
+            </div>
+        </div>
+
+        <!-- Bloque 3 -->
+        <div class="row seccion">
+            <div class="col">
+                <label>Fecha de inspección/muestreo</label>
+                <input type="date" name="fecha_inspeccion" class="form-control" required>
+            </div>
+            <div class="col">
+                <label>Hora de inspección/muestreo</label>
+                <input type="time" name="hora_inspeccion" class="form-control" required>
+            </div>
+            <div class="col">
+                <label>Destino</label>
+                <input type="text" name="destino" class="form-control" required>
+            </div>
+        </div>
+
+        <!-- Otros datos -->
+        <div class="seccion">
+            <div class="row">
+                <div class="col">
+                    <label>Solicitante</label>
+                    <input type="text" name="solicitante" class="form-control" required>
+                </div>
+                <div class="col">
+                    <label>Idioma de informe</label>
+                    <input type="text" name="idioma_informe" class="form-control" required>
+                </div>
+                <div class="col">
+                    <label>Trámite</label>
+                    <input type="text" name="tramite" class="form-control" required>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col">
+                    <label>Planta productora</label>
+                    <input type="text" name="planta_productora" class="form-control">
+                </div>
+                <div class="col">
+                    <label>Sede planta</label>
+                    <input type="text" name="sede_planta" class="form-control">
+                </div>
+                <div class="col">
+                    <label>Dirección de inspección</label>
+                    <input type="text" name="direccion_inspeccion" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <!-- Observaciones -->
+        <div class="seccion">
+            <label>Observaciones</label>
+            <textarea name="observaciones" class="form-control"></textarea>
+            <label class="mt-2">Observaciones Emisión</label>
+            <textarea name="observaciones_emision" class="form-control"></textarea>
+            <label class="mt-2">Nota</label>
+            <textarea name="nota" class="form-control"></textarea>
+            <label class="mt-2">Grupo destinatario / Matriz</label>
+            <input type="text" name="grupo_destinatario" class="form-control">
+        </div>
+
+        <!-- Sección Muestras -->
+        <h4>Muestras</h4>
+        <table id="tabla-muestras" class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Muestra/Vías</th>
+                    <th>Matriz</th>
+                    <th>Producto declarado</th>
+                    <th>Referencias</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input name="muestra_vias[]" class="form-control"></td>
+                    <td><input name="matriz[]" class="form-control"></td>
+                    <td><input name="producto_declarado[]" class="form-control"></td>
+                    <td><input name="referencias[]" class="form-control"></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="agregarFilaMuestra()">+ Agregar Muestra</button>
+
+        <!-- Sección Análisis -->
+        <h4 class="mt-4">Análisis</h4>
+        <table id="tabla-analisis" class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Análisis</th>
+                    <th>Acreditación</th>
+                    <th>Cantidad mínima</th>
+                    <th>Unidad</th>
+                    <th>Tiempo de reporte</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input name="analisis[]" class="form-control"></td>
+                    <td><input name="acreditacion[]" class="form-control"></td>
+                    <td><input name="cantidad_minima[]" class="form-control"></td>
+                    <td><input name="unidad[]" class="form-control"></td>
+                    <td><input name="tiempo_reporte[]" class="form-control"></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="agregarFilaAnalisis()">+ Agregar Análisis</button>
+
+        <!-- Sección Métodos -->
+        <h4 class="mt-4">Métodos</h4>
+        <table id="tabla-metodos" class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Análisis</th>
+                    <th>Método</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Se llena con JS -->
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-primary mt-3">Guardar Solicitud</button>
+    </form>
+</div>
+
+<script>
+function agregarFilaMuestra() {
+    let tbody = document.querySelector("#tabla-muestras tbody");
+    let fila = `
+        <tr>
+            <td><input name="muestra_vias[]" class="form-control"></td>
+            <td><input name="matriz[]" class="form-control"></td>
+            <td><input name="producto_declarado[]" class="form-control"></td>
+            <td><input name="referencias[]" class="form-control"></td>
+        </tr>
+    `;
+    tbody.insertAdjacentHTML("beforeend", fila);
+}
+
+function agregarFilaAnalisis() {
+    let tbody = document.querySelector("#tabla-analisis tbody");
+    let fila = `
+        <tr>
+            <td><input name="analisis[]" class="form-control"></td>
+            <td><input name="acreditacion[]" class="form-control"></td>
+            <td><input name="cantidad_minima[]" class="form-control"></td>
+            <td><input name="unidad[]" class="form-control"></td>
+            <td><input name="tiempo_reporte[]" class="form-control"></td>
+        </tr>
+    `;
+    tbody.insertAdjacentHTML("beforeend", fila);
+    actualizarMetodos();
+}
+
+function actualizarMetodos() {
+    let analisisInputs = document.querySelectorAll('input[name="analisis[]"]');
+    let tbody = document.querySelector("#tabla-metodos tbody");
+    tbody.innerHTML = "";
+    analisisInputs.forEach(a => {
+        if (a.value.trim() !== "") {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${a.value}</td>
+                    <td><input name="metodo[]" class="form-control"></td>
+                </tr>
+            `;
+        }
+    });
+}
+
+// Escuchar cambios en análisis para actualizar métodos
+document.querySelector("#tabla-analisis").addEventListener("input", actualizarMetodos);
+</script>
+
+</body>
+</html>

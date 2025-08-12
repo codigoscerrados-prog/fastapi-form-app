@@ -10,6 +10,8 @@ from starlette.responses import RedirectResponse
 from .models import LoginUser
 from starlette.middleware.sessions import SessionMiddleware
 from sqlalchemy.orm import joinedload
+from datetime import datetime
+
 
 # =========================
 # CONFIGURACIÓN INICIAL
@@ -239,3 +241,114 @@ def logout(request: Request):
     """Cierra la sesión del usuario y redirige al login."""
     request.session.clear()
     return RedirectResponse(url="/", status_code=303)
+
+#Generador del número de solicitud automático
+
+def generar_numero_solicitud(db: Session):
+    # Año en dos dígitos
+    year_suffix = datetime.now().strftime("%y")
+    
+    # Contar cuántas solicitudes hay este año
+    count = db.query(Solicitud).filter(Solicitud.numero_solicitud.like(f"%-{year_suffix}")).count()
+    
+    # Siguiente número
+    nuevo_numero = str(count + 1).zfill(6)
+    
+    return f"{nuevo_numero}-{year_suffix}"
+
+@app.get("/solicitud", response_class=HTMLResponse)
+def formulario_solicitud(request: Request, db: Session = Depends(get_db)):
+    numero = generar_numero_solicitud(db)
+    return templates.TemplateResponse("solicitud.html", {"request": request, "numero": numero})
+
+
+@app.post("/solicitud", response_class=HTMLResponse)
+def guardar_solicitud(
+    request: Request,
+    tipo_servicio: str = Form(...),
+    empresa: str = Form(...),
+    ruc: str = Form(...),
+    titular_informe: str = Form(...),
+    producto: str = Form(...),
+    tipo_certificado: str = Form(...),
+    tipo_proceso: str = Form(...),
+    solicitante: str = Form(...),
+    idioma_informe: str = Form(...),
+    destino: str = Form(...),
+    tramite: str = Form(...),
+    planta_productora: str = Form(...),
+    sede_planta: str = Form(...),
+    direccion_inspeccion: str = Form(...),
+    fecha_inspeccion: str = Form(...),
+    hora_inspeccion: str = Form(...),
+    observaciones: str = Form(None),
+    observaciones_emision: str = Form(None),
+    nota: str = Form(None),
+    grupo_destinatario: str = Form(...),
+
+    muestra_vias: list = Form([]),
+    matriz: list = Form([]),
+    producto_declarado: list = Form([]),
+    referencias: list = Form([]),
+    analisis: list = Form([]),
+    acreditacion: list = Form([]),
+    cantidad_minima: list = Form([]),
+    unidad: list = Form([]),
+    tiempo_reporte: list = Form([]),
+    metodo: list = Form([]),
+
+    db: Session = Depends(get_db)
+):
+    numero = generar_numero_solicitud(db)
+
+    solicitud = models.SolicitudServicio(
+        numero_solicitud=numero,
+        tipo_servicio=tipo_servicio,
+        empresa=empresa,
+        ruc=ruc,
+        titular_informe=titular_informe,
+        producto=producto,
+        tipo_certificado=tipo_certificado,
+        tipo_proceso=tipo_proceso,
+        solicitante=solicitante,
+        idioma_informe=idioma_informe,
+        destino=destino,
+        tramite=tramite,
+        planta_productora=planta_productora,
+        sede_planta=sede_planta,
+        direccion_inspeccion=direccion_inspeccion,
+        fecha_inspeccion=datetime.strptime(fecha_inspeccion, "%Y-%m-%d").date(),
+        hora_inspeccion=datetime.strptime(hora_inspeccion, "%H:%M").time(),
+        observaciones=observaciones,
+        observaciones_emision=observaciones_emision,
+        nota=nota,
+        grupo_destinatario=grupo_destinatario
+    )
+
+    # Guardar muestras
+    for i in range(len(muestra_vias)):
+        if muestra_vias[i].strip():
+            solicitud.muestras.append(models.Muestra(
+                muestra_vias=muestra_vias[i],
+                matriz=matriz[i],
+                producto_declarado=producto_declarado[i],
+                referencias=referencias[i],
+                analisis=analisis[i],
+                acreditacion=acreditacion[i],
+                cantidad_minima=cantidad_minima[i],
+                unidad=unidad[i],
+                tiempo_reporte=tiempo_reporte[i]
+            ))
+
+    # Guardar métodos
+    for i in range(len(metodo)):
+        if metodo[i].strip():
+            solicitud.metodos.append(models.Metodo(
+                analisis=analisis[i],
+                metodo=metodo[i]
+            ))
+
+    db.add(solicitud)
+    db.commit()
+
+    return RedirectResponse(url="/solicitud", status_code=303)

@@ -4,10 +4,10 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from . import models, schemas, email_utils
-from .database import SessionLocal, engine
+from .database import SessionLocal, engine, Base
 from passlib.context import CryptContext
 from starlette.responses import RedirectResponse
-from .models import LoginUser
+from .models import LoginUser, User, Solicitud, Muestra, Metodo  # importar todas las clases
 from starlette.middleware.sessions import SessionMiddleware
 from sqlalchemy.orm import joinedload
 from datetime import datetime

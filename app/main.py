@@ -244,22 +244,26 @@ def logout(request: Request):
 
 #Generador del número de solicitud automático
 
+# Función para generar número de solicitud
 def generar_numero_solicitud(db: Session):
-    # Año en dos dígitos
-    year_suffix = datetime.now().strftime("%y")
-    
-    # Contar cuántas solicitudes hay este año
-    count = db.query(Solicitud).filter(Solicitud.numero_solicitud.like(f"%-{year_suffix}")).count()
-    
-    # Siguiente número
-    nuevo_numero = str(count + 1).zfill(6)
-    
-    return f"{nuevo_numero}-{year_suffix}"
+    year_suffix = str(datetime.datetime.now().year)[-2:]
+    count = db.query(models.SolicitudServicio).filter(
+        models.SolicitudServicio.numero_solicitud.like(f"%-{year_suffix}")
+    ).count()
+    numero = str(count + 1).zfill(6)  # 6 dígitos
+    return f"{numero}-{year_suffix}"
 
 @app.get("/solicitud", response_class=HTMLResponse)
-def formulario_solicitud(request: Request, db: Session = Depends(get_db)):
-    numero = generar_numero_solicitud(db)
-    return templates.TemplateResponse("solicitud.html", {"request": request, "numero": numero})
+def solicitud_form(request: Request, db: Session = Depends(get_db)):
+    if not require_login(request):
+        return RedirectResponse(url="/login")
+
+    numero_solicitud = generar_numero_solicitud(db)
+
+    return templates.TemplateResponse("solicitud.html", {
+        "request": request,
+        "numero_solicitud": numero_solicitud
+    })
 
 
 @app.post("/solicitud", response_class=HTMLResponse)

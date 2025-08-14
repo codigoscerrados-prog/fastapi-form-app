@@ -38,12 +38,6 @@ def login(request: Request, username: str = Form(...), password: str = Form(...)
     user = db.query(models.LoginUser).filter(models.LoginUser.username == username).first()
     
     if user and verify_password(password, user.password):
-        if not user.is_confirmed:
-            return templates.TemplateResponse("login.html", {
-                "request": request,
-                "message": "Confirma tu correo antes de iniciar sesión.",
-                "alert_type": "warning"
-            })
         request.session["user"] = user.username
         return RedirectResponse(url="/dashboard", status_code=303)
     
@@ -53,6 +47,12 @@ def login(request: Request, username: str = Form(...), password: str = Form(...)
         "alert_type": "danger"
     })
 
+@app.get("/logout")
+def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse(url="/", status_code=303)
+
+
 @app.get("/registro_usuario", response_class=HTMLResponse)
 def register_form(request: Request):
     return templates.TemplateResponse("registro_usuario.html", {"request": request})
@@ -60,7 +60,7 @@ def register_form(request: Request):
 @app.post("/registro_usuario", response_class=HTMLResponse)
 async def register(request: Request, username: str = Form(...), email: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     hashed_password = get_password_hash(password)
-    new_user = models.LoginUser(username=username, email=email, password=hashed_password, is_confirmed=False)
+    new_user = models.LoginUser(username=username, email=email, password=hashed_password)
     db.add(new_user)
     try:
         db.commit()
@@ -82,9 +82,11 @@ async def confirm_email(request: Request, token: str, db: Session = Depends(get_
 
     user = db.query(models.LoginUser).filter(models.LoginUser.email == email).first()
     if user:
-        user.is_confirmed = True
-        db.commit()
-        return templates.TemplateResponse("login.html", {"request": request, "message": "Cuenta confirmada correctamente. Ya puedes iniciar sesión."})
+        return templates.TemplateResponse("login.html", {
+            "request": request,
+            "message": "Cuenta confirmada correctamente. Ya puedes iniciar sesión.",
+            "alert_type": "success"
+        })
     return templates.TemplateResponse("login.html", {"request": request, "message": "Usuario no encontrado"})
 
 

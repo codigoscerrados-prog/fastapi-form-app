@@ -1,5 +1,4 @@
 # app/utils/email_utils.py
-
 import os
 from email.message import EmailMessage
 import aiosmtplib

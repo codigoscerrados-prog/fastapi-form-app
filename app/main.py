@@ -69,3 +69,8 @@ def dashboard(request: Request):
         return RedirectResponse(url="/", status_code=303)
     current_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     return templates.TemplateResponse("dashboard.html", {"request": request, "user": user, "current_time": current_time})
+
+@app.get("/logout", response_class=HTMLResponse)
+def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse(url="/", status_code=303)

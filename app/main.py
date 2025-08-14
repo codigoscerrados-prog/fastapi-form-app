@@ -36,16 +36,22 @@ def login_form(request: Request):
 @app.post("/login", response_class=HTMLResponse)
 def login(request: Request, username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     user = db.query(models.LoginUser).filter(models.LoginUser.username == username).first()
+    
     if user and verify_password(password, user.password):
-    if not user.is_confirmed:
-        return templates.TemplateResponse("login.html", {
-            "request": request,
-            "message": "Confirma tu correo antes de iniciar sesión.",
-            "alert_type": "warning"
-        })
-    request.session["user"] = user.username
-    return RedirectResponse(url="/dashboard", status_code=303)
-    return templates.TemplateResponse("login.html", {"request": request, "message": "Credenciales incorrectas"})
+        if not user.is_confirmed:
+            return templates.TemplateResponse("login.html", {
+                "request": request,
+                "message": "Confirma tu correo antes de iniciar sesión.",
+                "alert_type": "warning"
+            })
+        request.session["user"] = user.username
+        return RedirectResponse(url="/dashboard", status_code=303)
+    
+    return templates.TemplateResponse("login.html", {
+        "request": request,
+        "message": "Credenciales incorrectas",
+        "alert_type": "danger"
+    })
 
 @app.get("/registro_usuario", response_class=HTMLResponse)
 def register_form(request: Request):

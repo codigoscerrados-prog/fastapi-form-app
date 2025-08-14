@@ -58,6 +58,19 @@ def register(request: Request, username: str = Form(...), email: str = Form(...)
     
 from datetime import datetime
 
+@app.get("/confirm")
+async def confirm_email(token: str, db: Session = Depends(get_db)):
+    email = confirm_token(token)
+    if not email:
+        return {"error": "Token inválido o expirado"}
+
+    user = db.query(User).filter(User.email == email).first()
+    if user:
+        user.is_confirmed = True
+        db.commit()
+        return {"message": "Cuenta confirmada correctamente"}
+    return {"error": "Usuario no encontrado"}
+
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard(request: Request):
     user = request.session.get("user")
@@ -65,3 +78,4 @@ def dashboard(request: Request):
         return RedirectResponse(url="/", status_code=303)
     current_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     return templates.TemplateResponse("dashboard.html", {"request": request, "user": user, "current_time": current_time})
+

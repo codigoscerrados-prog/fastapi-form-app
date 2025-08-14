@@ -85,9 +85,9 @@ def get_password_hash(password):
 @app.get("/regitrar_usuario", response_class=HTMLResponse)
 def form_registro_usuario(request: Request):
     """Muestra el formulario para registrar un nuevo usuario del sistema."""
-    return templates.TemplateResponse("regitrar_usuario.html", {"request": request})
+    return templates.TemplateResponse("registrar_usuario.html", {"request": request})
 
-@app.post("/regitrar_usuario", response_class=HTMLResponse)
+@app.post("/registrar_usuario", response_class=HTMLResponse)
 def registrar_usuario(
     request: Request,
     username: str = Form(...),
@@ -104,7 +104,7 @@ def registrar_usuario(
     except IntegrityError:
         db.rollback()
         message = "El nombre de usuario ya existe."
-    return templates.TemplateResponse("regitrar_usuario.html", {"request": request, "message": message})
+    return templates.TemplateResponse("registrar_usuario.html", {"request": request, "message": message})
 
 # =========================
 # LOGIN Y LOGOUT

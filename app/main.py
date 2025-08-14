@@ -6,15 +6,23 @@ from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from . import models, schemas
 from .database import SessionLocal, engine, Base
+from fastapi.staticfiles import StaticFiles
+from datetime import datetime
 
-Base.metadata.create_all(bind=engine)
-
+# ✅ Primero crea la instancia
 app = FastAPI()
-app.add_middleware(SessionMiddleware, secret_key="supersecretkey")
 
+# ✅ Luego monta los archivos estáticos
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+# ✅ Middleware y configuración
+app.add_middleware(SessionMiddleware, secret_key="supersecretkey")
 templates = Jinja2Templates(directory="app/templates")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+Base.metadata.create_all(bind=engine)
+
+# ✅ Funciones auxiliares
 def get_db():
     db = SessionLocal()
     try:
@@ -28,6 +36,7 @@ def get_password_hash(password):
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
+# ✅ Rutas
 @app.get("/", response_class=HTMLResponse)
 def login_form(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})

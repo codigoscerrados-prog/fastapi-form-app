@@ -7,6 +7,7 @@ from passlib.context import CryptContext
 from . import models, schemas
 from .database import SessionLocal, engine, Base
 from fastapi.staticfiles import StaticFiles
+from datetime import datetime
 app = FastAPI()
 
 Base.metadata.create_all(bind=engine)
@@ -36,8 +37,14 @@ def login_form(request: Request):
 def login(request: Request, username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     user = db.query(models.LoginUser).filter(models.LoginUser.username == username).first()
     if user and verify_password(password, user.password):
-        request.session["user"] = user.username
-        return RedirectResponse(url="/dashboard", status_code=303)
+    if not user.is_confirmed:
+        return templates.TemplateResponse("login.html", {
+            "request": request,
+            "message": "Confirma tu correo antes de iniciar sesión.",
+            "alert_type": "warning"
+        })
+    request.session["user"] = user.username
+    return RedirectResponse(url="/dashboard", status_code=303)
     return templates.TemplateResponse("login.html", {"request": request, "message": "Credenciales incorrectas"})
 
 @app.get("/registro_usuario", response_class=HTMLResponse)
@@ -45,31 +52,35 @@ def register_form(request: Request):
     return templates.TemplateResponse("registro_usuario.html", {"request": request})
 
 @app.post("/registro_usuario", response_class=HTMLResponse)
-def register(request: Request, username: str = Form(...), email: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+async def register(request: Request, username: str = Form(...), email: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     hashed_password = get_password_hash(password)
-    new_user = models.LoginUser(username=username, email=email, password=hashed_password)
+    new_user = models.LoginUser(username=username, email=email, password=hashed_password, is_confirmed=False)
     db.add(new_user)
     try:
         db.commit()
-        return RedirectResponse(url="/", status_code=303)
+        db.refresh(new_user)
+
+        token = generate_confirmation_token(new_user.email)
+        await send_confirmation_email(new_user.email, new_user.username, token)
+
+        return templates.TemplateResponse("registro_usuario.html", {"request": request, "message": "Registro exitoso. Revisa tu correo para confirmar tu cuenta."})
     except:
         db.rollback()
         return templates.TemplateResponse("registro_usuario.html", {"request": request, "message": "Usuario o correo ya registrado"})
-    
-from datetime import datetime
 
-@app.get("/confirm")
-async def confirm_email(token: str, db: Session = Depends(get_db)):
+@app.get("/confirm", response_class=HTMLResponse)
+async def confirm_email(request: Request, token: str, db: Session = Depends(get_db)):
     email = confirm_token(token)
     if not email:
-        return {"error": "Token inválido o expirado"}
+        return templates.TemplateResponse("login.html", {"request": request, "message": "Token inválido o expirado"})
 
-    user = db.query(User).filter(User.email == email).first()
+    user = db.query(models.LoginUser).filter(models.LoginUser.email == email).first()
     if user:
         user.is_confirmed = True
         db.commit()
-        return {"message": "Cuenta confirmada correctamente"}
-    return {"error": "Usuario no encontrado"}
+        return templates.TemplateResponse("login.html", {"request": request, "message": "Cuenta confirmada correctamente. Ya puedes iniciar sesión."})
+    return templates.TemplateResponse("login.html", {"request": request, "message": "Usuario no encontrado"})
+
 
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard(request: Request):

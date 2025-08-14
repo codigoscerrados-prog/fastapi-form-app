@@ -9,20 +9,20 @@ from .database import SessionLocal, engine, Base
 from fastapi.staticfiles import StaticFiles
 from datetime import datetime
 
-# ✅ Primero crea la instancia
+# Primero crea la instancia
 app = FastAPI()
 
-# ✅ Luego monta los archivos estáticos
+# Luego monta los archivos estáticos
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-# ✅ Middleware y configuración
+# Middleware y configuración
 app.add_middleware(SessionMiddleware, secret_key="supersecretkey")
 templates = Jinja2Templates(directory="app/templates")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 Base.metadata.create_all(bind=engine)
 
-# ✅ Funciones auxiliares
+# Funciones auxiliares
 def get_db():
     db = SessionLocal()
     try:
@@ -36,7 +36,7 @@ def get_password_hash(password):
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
-# ✅ Rutas
+# Rutas
 @app.get("/", response_class=HTMLResponse)
 def login_form(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})

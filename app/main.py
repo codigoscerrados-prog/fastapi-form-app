@@ -7,14 +7,11 @@ from passlib.context import CryptContext
 from . import models, schemas
 from .database import SessionLocal, engine, Base
 from fastapi.staticfiles import StaticFiles
-
+app = FastAPI()
 
 Base.metadata.create_all(bind=engine)
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
-
-app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key="supersecretkey")
-
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

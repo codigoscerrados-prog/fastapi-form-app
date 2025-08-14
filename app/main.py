@@ -11,6 +11,7 @@ from .models import LoginUser
 from starlette.middleware.sessions import SessionMiddleware
 from sqlalchemy.orm import joinedload
 from datetime import datetime
+import os
 
 # =========================
 # CONFIGURACIÓN INICIAL
@@ -23,7 +24,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 # Middleware para manejar sesiones (necesario para login/logout)
-app.add_middleware(SessionMiddleware, secret_key="tu_clave_secreta_segura")
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY", "fallback_key"))
 
 # Configuración de plantillas HTML con Jinja2
 templates = Jinja2Templates(directory="app/templates")
@@ -52,7 +53,7 @@ def submit_user(data: schemas.UserCreate, db: Session = Depends(get_db)):
     Envía un correo de confirmación.
     """
     try:
-        user = models.User(**data.dict())
+        user = models.LoginUser(**data.dict())
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -127,7 +128,7 @@ def login(
     if user and verify_password(password, user.password):
         request.session["user"] = username  # Guarda nombre en sesión
         request.session["user_id"] = user.id  # Guarda ID en sesión
-        return RedirectResponse(url="/form", status_code=303)
+        return RedirectResponse(url="/dashboard", status_code=303)
     else:
         return templates.TemplateResponse("login.html", {"request": request, "message": "Usuario o contraseña incorrectos"})
 

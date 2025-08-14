@@ -7,5 +7,5 @@ from datetime import datetime
 class LoginUser(Base):
     __tablename__ = "login_users"
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    password = Column(String)
+    username = Column(String(150), unique=True, index=True)
+    password = Column(String(10))

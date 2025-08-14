@@ -141,3 +141,9 @@ def logout(request: Request):
     """Cierra la sesión del usuario y redirige al login."""
     request.session.clear()
     return RedirectResponse(url="/", status_code=303)
+
+@app.get("/dashboard", response_class=HTMLResponse)
+def dashboard(request: Request):
+    if not require_login(request):
+        return RedirectResponse(url="/", status_code=303)
+    return templates.TemplateResponse("dashboard.html", {"request": request})

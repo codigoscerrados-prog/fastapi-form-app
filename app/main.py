@@ -12,9 +12,6 @@ from datetime import datetime
 # Primero crea la instancia
 app = FastAPI()
 
-# Luego monta los archivos estáticos
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
-
 # Middleware y configuración
 app.add_middleware(SessionMiddleware, secret_key="supersecretkey")
 templates = Jinja2Templates(directory="app/templates")

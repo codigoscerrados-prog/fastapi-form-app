@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Contacto{% endblock %}
+
+{% block content %}
+<div class="card shadow p-4">
+    <h4 class="mb-3">Editar Contacto</h4>
+    <form method="post">
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" id="nombre" name="nombre" class="form-control" value="{{ contacto.nombre }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input type="text" id="telefono" name="telefono" class="form-control" value="{{ contacto.telefono }}">
+        </div>
+        <div class="mb-3">
+            <label for="correo" class="form-label">Correo</label>
+            <input type="email" id="correo" name="correo" class="form-control" value="{{ contacto.correo }}">
+        </div>
+        <div class="d-flex justify-content-between">
+            <a href="/clientes" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

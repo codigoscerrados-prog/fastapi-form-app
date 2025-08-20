@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from starlette.middleware.sessions import SessionMiddleware
 from .database import SessionLocal, engine, Base
-from . import auth, clientes, models, schemas
+from . import auth, clientes, models, schemas, contactos
 from fastapi.templating import Jinja2Templates
 from datetime import datetime
 
@@ -23,3 +23,4 @@ templates.env.globals['current_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:
 # Incluir routers
 app.include_router(auth.router)
 app.include_router(clientes.router)
+app.include_router(contactos.router)

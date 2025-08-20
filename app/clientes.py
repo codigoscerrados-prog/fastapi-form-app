@@ -7,9 +7,27 @@ from .database import get_db
 from . import models
 
 router = APIRouter()
-templates = Jinja2Templates(directory="app/templates")  # ajusta si tu carpeta es distinta
+templates = Jinja2Templates(directory="app/templates")  # ajusta si es distinta
 
 
+# 🟢 Ruta para mostrar el formulario de nuevo cliente
+@router.get("/clientes/nuevo", response_class=HTMLResponse)
+async def nuevo_cliente(request: Request):
+    user = request.session.get("user")
+    if not user:
+        return HTMLResponse("No autorizado", status_code=403)
+
+    return templates.TemplateResponse(
+        "addcliente.html",
+        {
+            "request": request,
+            "user": user,
+            "current_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        }
+    )
+
+
+# 🟢 Ruta para procesar y guardar el cliente
 @router.post("/clientes/crear", response_class=HTMLResponse)
 async def crear_cliente(
     request: Request,
@@ -44,9 +62,8 @@ async def crear_cliente(
         db.commit()
         db.refresh(nuevo_cliente)
 
-        # 2️⃣ Procesar contactos dinámicos del formulario
+        # 2️⃣ Procesar contactos dinámicos
         form_data = await request.form()
-        contactos = []
         for key in form_data.keys():
             if key.startswith("contactos[") and key.endswith("][nombre]"):
                 index = key.split("[")[1].split("]")[0]
@@ -54,7 +71,7 @@ async def crear_cliente(
                 telefono_contacto = form_data.get(f"contactos[{index}][telefono]")
                 correo_contacto = form_data.get(f"contactos[{index}][correo]")
 
-                if nombre_contacto:  # Solo guardar si hay nombre
+                if nombre_contacto:  # Guardar solo si hay nombre
                     contacto = models.Contacto(
                         nombre=nombre_contacto,
                         telefono=telefono_contacto,
@@ -62,11 +79,10 @@ async def crear_cliente(
                         cliente_id=nuevo_cliente.id
                     )
                     db.add(contacto)
-                    contactos.append(contacto)
 
         db.commit()
 
-        # 3️⃣ Redirigir al dashboard o a lista de clientes
+        # 3️⃣ Redirigir a lista de clientes
         return RedirectResponse(url="/clientes", status_code=303)
 
     except Exception as e:

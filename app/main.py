@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from starlette.middleware.sessions import SessionMiddleware
-from .database import Base, engine
-from . import auth, clientes
+from .database import SessionLocal, engine, Base
+from . import auth, clientes, models, schemas
 
 # Crear la app
 app = FastAPI()

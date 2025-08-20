@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from typing import Optional
 from . import models, schemas
 from .database import SessionLocal
+from datetime import datetime
 
 router = APIRouter(prefix="/clientes", tags=["clientes"])
 templates = Jinja2Templates(directory="app/templates")

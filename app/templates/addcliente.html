@@ -1,82 +1,118 @@
-<form method="POST" action="/clientes/crear" class="p-4 bg-white shadow rounded">
-    <h4 class="mb-4">Registro de Cliente</h4>
+{% extends "base.html" %}
+{% block title %}Agregar Cliente{% endblock %}
 
-    <!-- Datos del cliente -->
-    <div class="mb-3">
-        <label class="form-label">Nombre o Razón Social</label>
-        <input type="text" name="nombre" class="form-control" required>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-8">
+        <form method="POST" action="/clientes/crear" class="p-4 bg-white shadow rounded-4 border">
+            <h4 class="mb-4 text-primary"><i class="bi bi-person-plus-fill me-2"></i>Registro de Cliente</h4>
+
+            <!-- Datos del cliente -->
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Nombre o Razón Social</label>
+                    <input type="text" name="nombre" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">RUC</label>
+                    <input type="text" name="ruc" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Correo principal</label>
+                    <input type="email" name="correo" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Condición de pago</label>
+                    <select name="condicion_pago" class="form-select">
+                        <option value="30">Crédito a 30 días</option>
+                        <option value="60">Crédito a 60 días</option>
+                        <option value="90">Crédito a 90 días</option>
+                        <option value="120">Crédito a 120 días</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Direcciones -->
+            <hr class="my-4">
+            <h5 class="text-secondary"><i class="bi bi-geo-alt-fill me-2"></i>Direcciones</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Dirección fiscal</label>
+                    <input type="text" name="direccion_fiscal" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Dirección envío de informe</label>
+                    <input type="text" name="direccion_envio_informe" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Dirección envío de factura</label>
+                    <input type="text" name="direccion_envio_factura" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Correo para envío de factura</label>
+                    <input type="email" name="correo_envio_factura" class="form-control">
+                </div>
+            </div>
+
+            <!-- Contactos dinámicos -->
+            <hr class="my-4">
+            <h5 class="text-secondary"><i class="bi bi-people-fill me-2"></i>Contactos</h5>
+            <div id="contactos-container" class="mb-3">
+                <div class="border p-3 rounded-3 bg-light mb-2">
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <input type="text" name="contactos[0][nombre]" class="form-control"
+                                placeholder="Nombre del contacto">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="contactos[0][telefono]" class="form-control"
+                                placeholder="Teléfono">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="email" name="contactos[0][correo]" class="form-control" placeholder="Correo">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-outline-secondary mb-4" onclick="agregarContacto()">
+                <i class="bi bi-person-plus"></i> Agregar otro contacto
+            </button>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-save2"></i> Guardar cliente
+                </button>
+            </div>
+        </form>
     </div>
+</div>
+{% endblock %}
 
-    <div class="mb-3">
-        <label class="form-label">RUC</label>
-        <input type="text" name="ruc" class="form-control" required>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Correo principal</label>
-        <input type="email" name="correo" class="form-control">
-    </div>
-
-    <!-- Condición de pago -->
-    <div class="mb-3">
-        <label class="form-label">Condición de pago</label>
-        <select name="condicion_pago" class="form-select">
-            <option value="30">Crédito a 30 días</option>
-            <option value="60">Crédito a 60 días</option>
-            <option value="90">Crédito a 90 días</option>
-            <option value="120">Crédito a 120 días</option>
-        </select>
-    </div>
-
-    <!-- Direcciones -->
-    <div class="mb-3">
-        <label class="form-label">Dirección fiscal</label>
-        <input type="text" name="direccion_fiscal" class="form-control">
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Dirección envío de informe</label>
-        <input type="text" name="direccion_envio_informe" class="form-control">
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Dirección envío de factura</label>
-        <input type="text" name="direccion_envio_factura" class="form-control">
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Correo para envío de factura</label>
-        <input type="email" name="correo_envio_factura" class="form-control">
-    </div>
-
-    <!-- Contactos dinámicos -->
-    <div id="contactos-container" class="mb-3">
-        <label class="form-label">Contactos</label>
-        <div class="border p-3 rounded mb-2">
-            <input type="text" name="contactos[0][nombre]" class="form-control mb-2" placeholder="Nombre del contacto">
-            <input type="text" name="contactos[0][telefono]" class="form-control mb-2" placeholder="Teléfono">
-            <input type="email" name="contactos[0][correo]" class="form-control" placeholder="Correo">
-        </div>
-    </div>
-
-    <button type="button" class="btn btn-outline-secondary mb-3" onclick="agregarContacto()">Agregar otro
-        contacto</button>
-
-    <button type="submit" class="btn btn-primary">Guardar cliente</button>
-</form>
-
+{% block scripts %}
+{% raw %}
 <script>
     let contactoIndex = 1;
     function agregarContacto() {
         const container = document.getElementById("contactos-container");
         const div = document.createElement("div");
-        div.className = "border p-3 rounded mb-2";
+        div.className = "border p-3 rounded-3 bg-light mb-2";
         div.innerHTML = `
-      <input type="text" name="contactos[${contactoIndex}][nombre]" class="form-control mb-2" placeholder="Nombre del contacto">
-      <input type="text" name="contactos[${contactoIndex}][telefono]" class="form-control mb-2" placeholder="Teléfono">
-      <input type="email" name="contactos[${contactoIndex}][correo]" class="form-control" placeholder="Correo">
+      <div class="row g-2">
+        <div class="col-md-4">
+          <input type="text" name="contactos[${contactoIndex}][nombre]" class="form-control" placeholder="Nombre del contacto">
+        </div>
+        <div class="col-md-4">
+          <input type="text" name="contactos[${contactoIndex}][telefono]" class="form-control" placeholder="Teléfono">
+        </div>
+        <div class="col-md-4">
+          <input type="email" name="contactos[${contactoIndex}][correo]" class="form-control" placeholder="Correo">
+        </div>
+      </div>
     `;
         container.appendChild(div);
         contactoIndex++;
     }
 </script>
+{% endraw %}
+{% endblock %}

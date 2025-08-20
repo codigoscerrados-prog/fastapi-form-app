@@ -47,7 +47,7 @@ async def crear_cliente(
         return HTMLResponse("No autorizado", status_code=403)
 
     try:
-        # 1️⃣ Crear cliente (sin creado_en, ya se maneja con created_at en el modelo)
+        # 1️⃣ Crear cliente
         nuevo_cliente = models.Cliente(
             nombre=nombre,
             ruc=ruc,
@@ -82,7 +82,6 @@ async def crear_cliente(
 
         db.commit()
 
-        # 3️⃣ Redirigir a lista de clientes
         return RedirectResponse(url="/clientes", status_code=303)
 
     except Exception as e:
@@ -97,8 +96,9 @@ async def crear_cliente(
             },
             status_code=500
         )
-        
-        # 🟢 Ruta para listar clientes
+
+
+# 🟢 Ruta para listar clientes con contactos
 @router.get("/clientes", response_class=HTMLResponse)
 async def listar_clientes(request: Request, db: Session = Depends(get_db)):
     user = request.session.get("user")
@@ -108,7 +108,7 @@ async def listar_clientes(request: Request, db: Session = Depends(get_db)):
     clientes = db.query(models.Cliente).all()
 
     return templates.TemplateResponse(
-        "clientes.html",  # 👈 tienes que crear esta plantilla
+        "clientes.html",
         {
             "request": request,
             "user": user,
@@ -116,3 +116,9 @@ async def listar_clientes(request: Request, db: Session = Depends(get_db)):
             "current_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
     )
+
+
+# 🟢 Editar contacto
+@router.post("/contactos/{contacto_id}/editar")
+async def editar_contacto(
+    request

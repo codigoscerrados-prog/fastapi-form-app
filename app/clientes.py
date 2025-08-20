@@ -1,3 +1,4 @@
+# clientes.py
 from fastapi import APIRouter, Request, Form, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -46,7 +47,7 @@ async def crear_cliente(
         return HTMLResponse("No autorizado", status_code=403)
 
     try:
-        # 1️⃣ Crear cliente
+        # 1️⃣ Crear cliente (sin creado_en, ya se maneja con created_at en el modelo)
         nuevo_cliente = models.Cliente(
             nombre=nombre,
             ruc=ruc,
@@ -55,8 +56,7 @@ async def crear_cliente(
             direccion_fiscal=direccion_fiscal,
             direccion_envio_informe=direccion_envio_informe,
             direccion_envio_factura=direccion_envio_factura,
-            correo_envio_factura=correo_envio_factura,
-            creado_en=datetime.now()
+            correo_envio_factura=correo_envio_factura
         )
         db.add(nuevo_cliente)
         db.commit()

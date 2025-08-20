@@ -3,9 +3,10 @@ uvicorn[standard]
 sqlalchemy
 jinja2
 python-multipart
-passlib[bcrypt]
 email-validator
 psycopg2-binary
 python-dotenv
 itsdangerous
 starlette
+bcrypt==4.0.1
+passlib==1.7.4

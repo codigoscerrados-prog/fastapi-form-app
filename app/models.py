@@ -3,7 +3,10 @@ from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, T
 from sqlalchemy.sql import func
 from .database import Base
 from sqlalchemy.orm import relationship
+from datetime import datetime
+import pytz
 
+PERU_TZ = pytz.timezone("America/Lima")
 
 class LoginUser(Base):
     __tablename__ = "login_users"
@@ -31,7 +34,7 @@ class Cliente(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=lambda: datetime.now(PERU_TZ))
     
     contactos = relationship("Contacto", back_populates="cliente", cascade="all, delete")
-    tipo_documento_id = Column(Integer, ForeignKey("tipo_documento.id"))
+    tipo_documento_id = Column(Integer, ForeignKey("tipo_documento.id"), nullable=True)
     tipo_documento = relationship("TipoDocumento")
 
 class Contacto(Base):

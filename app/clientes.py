@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Form, Depends
+from fastapi import APIRouter, Request, Form, Depends 
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -18,9 +18,10 @@ def get_db():
 
 @router.get("/nuevo", response_class=HTMLResponse)
 def nuevo_cliente_form(request: Request):
-    if not request.session.get("user"):
+    user = request.session.get("user")
+    if not user:
         return RedirectResponse(url="/", status_code=303)
-    return templates.TemplateResponse("addcliente.html", {"request": request})
+    return templates.TemplateResponse("addcliente.html", {"request": request, "user": user})
 
 @router.post("/crear")
 async def crear_cliente(
@@ -72,10 +73,3 @@ async def crear_cliente(
 
     db.commit()
     return RedirectResponse(url="/dashboard", status_code=303)
-
-@app.get("/clientes/nuevo", response_class=HTMLResponse)
-def nuevo_cliente_form(request: Request):
-    user = request.session.get("user")
-    if not user:
-        return RedirectResponse(url="/", status_code=303)
-    return templates.TemplateResponse("addcliente.html", {"request": request, "user": user})

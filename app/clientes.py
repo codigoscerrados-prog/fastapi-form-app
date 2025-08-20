@@ -97,3 +97,22 @@ async def crear_cliente(
             },
             status_code=500
         )
+        
+        # 🟢 Ruta para listar clientes
+@router.get("/clientes", response_class=HTMLResponse)
+async def listar_clientes(request: Request, db: Session = Depends(get_db)):
+    user = request.session.get("user")
+    if not user:
+        return HTMLResponse("No autorizado", status_code=403)
+
+    clientes = db.query(models.Cliente).all()
+
+    return templates.TemplateResponse(
+        "clientes.html",  # 👈 tienes que crear esta plantilla
+        {
+            "request": request,
+            "user": user,
+            "clientes": clientes,
+            "current_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        }
+    )

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Clientes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-primary">📋 Clientes Registrados</h2>
+            <a href="/clientes/nuevo" class="btn btn-success shadow-sm">
+                ➕ Nuevo Cliente
+            </a>
+        </div>
+
+        <!-- Tabla de clientes -->
+        <div class="card shadow-sm rounded-3">
+            <div class="card-body p-4">
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover">
+                        <thead class="table-primary">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">RUC</th>
+                                <th scope="col">Correo</th>
+                                <th scope="col">Condición de Pago</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cliente in clientes %}
+                            <tr>
+                                <td class="fw-semibold">{{ cliente.id }}</td>
+                                <td>{{ cliente.nombre }}</td>
+                                <td>{{ cliente.ruc }}</td>
+                                <td>{{ cliente.correo or "-" }}</td>
+                                <td>
+                                    <span class="badge bg-info text-dark">
+                                        {{ cliente.condicion_pago or "No definido" }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="#" class="btn btn-outline-primary">Editar</a>
+                                        <a href="#" class="btn btn-outline-danger">Eliminar</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    🚫 No hay clientes registrados aún
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

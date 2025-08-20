@@ -135,3 +135,10 @@ async def crear_cliente(
 
     db.commit()
     return RedirectResponse(url="/dashboard", status_code=303)
+
+@app.get("/clientes/nuevo", response_class=HTMLResponse)
+def nuevo_cliente_form(request: Request):
+    user = request.session.get("user")
+    if not user:
+        return RedirectResponse(url="/", status_code=303)
+    return templates.TemplateResponse("addcliente.html", {"request": request, "user": user})

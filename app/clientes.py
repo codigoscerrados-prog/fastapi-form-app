@@ -121,4 +121,63 @@ async def listar_clientes(request: Request, db: Session = Depends(get_db)):
 # 🟢 Editar contacto
 @router.post("/contactos/{contacto_id}/editar")
 async def editar_contacto(
-    request
+    request: Request,
+    contacto_id: int,
+    nombre: str = Form(...),
+    telefono: str = Form(None),
+    correo: str = Form(None),
+    db: Session = Depends(get_db)
+):
+    user = request.session.get("user")
+    if not user:
+        return HTMLResponse("No autorizado", status_code=403)
+
+    contacto = db.query(models.Contacto).filter_by(id=contacto_id).first()
+    if contacto:
+        contacto.nombre = nombre
+        contacto.telefono = telefono
+        contacto.correo = correo
+        db.commit()
+
+    return RedirectResponse(url="/clientes", status_code=303)
+
+
+# 🟢 Agregar contacto a un cliente
+@router.post("/clientes/{cliente_id}/contactos/nuevo")
+async def agregar_contacto(
+    request: Request,
+    cliente_id: int,
+    nombre: str = Form(...),
+    telefono: str = Form(None),
+    correo: str = Form(None),
+    db: Session = Depends(get_db)
+):
+    user = request.session.get("user")
+    if not user:
+        return HTMLResponse("No autorizado", status_code=403)
+
+    nuevo = models.Contacto(
+        nombre=nombre,
+        telefono=telefono,
+        correo=correo,
+        cliente_id=cliente_id
+    )
+    db.add(nuevo)
+    db.commit()
+
+    return RedirectResponse(url="/clientes", status_code=303)
+
+
+# 🟢 Eliminar contacto
+@router.post("/contactos/{contacto_id}/eliminar")
+async def eliminar_contacto(request: Request, contacto_id: int, db: Session = Depends(get_db)):
+    user = request.session.get("user")
+    if not user:
+        return HTMLResponse("No autorizado", status_code=403)
+
+    contacto = db.query(models.Contacto).filter_by(id=contacto_id).first()
+    if contacto:
+        db.delete(contacto)
+        db.commit()
+
+    return RedirectResponse(url="/clientes", status_code=303)
